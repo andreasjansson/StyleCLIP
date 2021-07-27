@@ -1,38 +1,37 @@
-import tempfile
-from pathlib import Path
+import copy
 import os
-from argparse import Namespace
-import time
-import dlib
-import os
+import pickle
 import sys
+import tempfile
+import time
+from argparse import Namespace
+from pathlib import Path
+
+import clip
+import cog
+import dlib
+import matplotlib.pyplot as plt
 import numpy as np
-from PIL import Image
+import tensorflow as tf
 import torch
 import torchvision.transforms as transforms
-import tensorflow as tf
-import numpy as np
-import torch
-import clip
 from PIL import Image
-import pickle
-import copy
-import matplotlib.pyplot as plt
-from MapTS import GetFs, GetBoundary, GetDt
-from manipulate import Manipulator
-from dnnlib import tflib
 
 sys.path.insert(0, "/content")
 sys.path.insert(0, "/content/encoder4editing")
 
-from encoder4editing.utils.common import tensor2im
-from encoder4editing.utils.alignment import align_face
 from encoder4editing.models.psp import pSp
+from encoder4editing.utils.alignment import align_face
+from encoder4editing.utils.common import tensor2im
 
-import cog
+sys.path.insert(0, "global_directions")
+
+from dnnlib import tflib
+from manipulate import Manipulator
+from MapTS import GetBoundary, GetDt, GetFs
 
 
-class Model(cog.Model):
+class Predictor(cog.Predictor):
     def setup(self):
         print("starting setup")
 
@@ -80,7 +79,7 @@ class Model(cog.Model):
             #tflib.init_tf()
 
             self.M = Manipulator(dataset_name="ffhq", sess=self.sess)
-            self.fs3 = np.load("./npy/ffhq/fs3.npy")
+            self.fs3 = np.load("./global_directions/npy/ffhq/fs3.npy")
             np.set_printoptions(suppress=True)
 
         print("setup complete")
